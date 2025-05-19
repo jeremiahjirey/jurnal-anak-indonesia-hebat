@@ -50,7 +50,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ entry, onUpdate }) => {
     
     setIsDeleting(true);
     try {
-      await mockApi.deleteEntry(entry.id, entry.studentId);
+      // Here was the issue - mockApi.deleteEntry was called with two arguments
+      // but likely only expects one (the entry ID)
+      await mockApi.deleteEntry(entry.id);
       toast({
         title: "Berhasil",
         description: "Aktivitas berhasil dihapus",
