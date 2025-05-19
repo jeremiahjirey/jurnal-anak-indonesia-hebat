@@ -5,10 +5,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye, EyeOff, Key, User } from "lucide-react";
 
 const Login = () => {
-  const [studentId, setStudentId] = useState("");
+  const [nisn, setNisn] = useState("");
+  const [nis, setNis] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -17,13 +20,17 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      const success = await login(studentId);
+      const success = await login(nisn, nis);
       if (success) {
         navigate("/dashboard");
       }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -42,17 +49,43 @@ const Login = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="studentId" className="text-sm font-medium">
-                  ID Siswa
+                <label htmlFor="nisn" className="text-sm font-medium flex items-center gap-2">
+                  <User size={18} />
+                  NISN
                 </label>
                 <Input
-                  id="studentId"
-                  placeholder="Masukkan ID Siswa"
-                  value={studentId}
-                  onChange={(e) => setStudentId(e.target.value)}
+                  id="nisn"
+                  placeholder="Masukkan NISN"
+                  value={nisn}
+                  onChange={(e) => setNisn(e.target.value)}
                   required
                   className="h-12"
                 />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="nis" className="text-sm font-medium flex items-center gap-2">
+                  <Key size={18} />
+                  NIS (Password)
+                </label>
+                <div className="relative">
+                  <Input
+                    id="nis"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Masukkan NIS"
+                    value={nis}
+                    onChange={(e) => setNis(e.target.value)}
+                    required
+                    className="h-12 pr-10"
+                  />
+                  <button 
+                    type="button"
+                    onClick={toggleShowPassword}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
               </div>
               
               <Button 
@@ -67,7 +100,7 @@ const Login = () => {
           
           <CardFooter className="flex justify-center border-t p-4">
             <p className="text-sm text-muted-foreground">
-              Catatan: Gunakan ID Siswa yang diberikan oleh sekolah.
+              Gunakan NISN dan NIS yang diberikan oleh sekolah.
             </p>
           </CardFooter>
         </Card>

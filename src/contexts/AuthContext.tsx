@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 type AuthContextType = {
   studentId: string | null;
   isAuthenticated: boolean;
-  login: (studentId: string) => Promise<boolean>;
+  login: (nisn: string, nis: string) => Promise<boolean>;
   logout: () => void;
 };
 
@@ -36,25 +36,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  // Simple login function - in a real app, we would validate with backend
-  const login = async (id: string): Promise<boolean> => {
-    if (!id.trim()) {
+  // Updated login function that requires NISN and NIS
+  const login = async (nisn: string, nis: string): Promise<boolean> => {
+    if (!nisn.trim() || !nis.trim()) {
       toast({
         title: "Error",
-        description: "ID Siswa tidak boleh kosong",
+        description: "NISN dan NIS tidak boleh kosong",
         variant: "destructive",
       });
       return false;
     }
     
-    // Store student ID in local storage
-    localStorage.setItem("studentId", id);
-    setStudentId(id);
+    // In a real app, validate credentials with backend
+    // For now, we'll just check that both fields have values
+    
+    // Store student ID (NISN) in local storage
+    localStorage.setItem("studentId", nisn);
+    setStudentId(nisn);
     setIsAuthenticated(true);
     
     toast({
       title: "Login Berhasil",
-      description: `Selamat datang, ${id}!`,
+      description: `Selamat datang, Siswa NISN: ${nisn}!`,
     });
     
     return true;
