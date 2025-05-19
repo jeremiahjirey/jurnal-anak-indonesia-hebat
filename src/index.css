@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -13,10 +14,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 222 92% 60%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 45 100% 52%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -35,19 +36,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -97,5 +91,39 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .journal-card {
+    @apply p-4 rounded-lg shadow-md transition-all hover:shadow-lg;
+  }
+  
+  .journal-morning {
+    @apply border-l-4 border-journal-morning bg-blue-50;
+  }
+  
+  .journal-afternoon {
+    @apply border-l-4 border-journal-afternoon bg-yellow-50;
+  }
+  
+  .journal-evening {
+    @apply border-l-4 border-journal-evening bg-orange-50;
+  }
+  
+  .category-title {
+    @apply text-lg font-bold mb-2;
+  }
+  
+  .category-morning {
+    @apply text-journal-morning;
+  }
+  
+  .category-afternoon {
+    @apply text-journal-afternoon;
+  }
+  
+  .category-evening {
+    @apply text-journal-evening;
   }
 }
