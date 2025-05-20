@@ -2,12 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  JournalEntry, 
-  mockApi as api, 
-  HabitType, 
-  ReligionType
-} from "@/lib/api";
+import { JournalEntry, mockApi as api, HabitType } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,14 +33,14 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   const { studentId } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [habit, setHabit] = useState<HabitType | "">((defaultEntry?.habit as HabitType) || "");
-  const [religion, setReligion] = useState<ReligionType | "">((defaultEntry?.religion as ReligionType) || "");
+  const [religion, setReligion] = useState<string>(defaultEntry?.religion || "");
   
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<JournalEntry>({
     defaultValues: defaultEntry || {
       studentId: studentId || "",
       date: defaultDate ? new Date(defaultDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
       habit: "" as HabitType,
-      religion: "" as ReligionType,
+      religion: "",
       validatedByTeacher: false,
       validatedByParent: false
     }
@@ -55,7 +50,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   useEffect(() => {
     if (defaultEntry) {
       setHabit(defaultEntry.habit);
-      setReligion(defaultEntry.religion || "" as ReligionType);
+      setReligion(defaultEntry.religion || "");
       
       Object.entries(defaultEntry).forEach(([key, value]) => {
         setValue(key as keyof JournalEntry, value);
@@ -122,8 +117,8 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
         <Label htmlFor="religion">Agama</Label>
         <Select 
           onValueChange={(value) => {
-            setReligion(value as ReligionType);
-            setValue("religion", value as ReligionType);
+            setReligion(value);
+            setValue("religion", value);
           }} 
           defaultValue={religion || undefined}
         >
@@ -137,7 +132,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
             <SelectItem value="Hindu">Hindu</SelectItem>
             <SelectItem value="Buddha">Buddha</SelectItem>
             <SelectItem value="Konghucu">Konghucu</SelectItem>
-            <SelectItem value="lain-lain">Lainnya</SelectItem>
+            <SelectItem value="Lainnya">Lainnya</SelectItem>
           </SelectContent>
         </Select>
         {!religion && <p className="text-sm text-red-500">Agama harus dipilih</p>}
@@ -171,7 +166,6 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
       {/* Dynamic fields based on habit type */}
       <HabitFormSelector 
         habit={habit}
-        religion={religion}
         register={register}
         errors={errors}
         setValue={setValue}

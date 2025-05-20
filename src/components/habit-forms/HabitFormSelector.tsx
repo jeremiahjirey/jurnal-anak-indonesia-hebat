@@ -1,6 +1,6 @@
 
 import React from "react";
-import { JournalEntry, HabitType, ReligionType, PrayerType } from "@/lib/api";
+import { JournalEntry, HabitType } from "@/lib/api";
 import { UseFormRegister, FieldErrors, UseFormSetValue } from "react-hook-form";
 
 import BangunPagiForm from "./BangunPagiForm";
@@ -13,7 +13,6 @@ import TidurCepatForm from "./TidurCepatForm";
 
 interface HabitFormSelectorProps {
   habit: HabitType | "";
-  religion: ReligionType | "";
   register: UseFormRegister<JournalEntry>;
   errors: FieldErrors<JournalEntry>;
   setValue: UseFormSetValue<JournalEntry>;
@@ -21,8 +20,7 @@ interface HabitFormSelectorProps {
 }
 
 const HabitFormSelector: React.FC<HabitFormSelectorProps> = ({ 
-  habit, 
-  religion, 
+  habit,
   register, 
   errors, 
   setValue,
@@ -39,9 +37,8 @@ const HabitFormSelector: React.FC<HabitFormSelectorProps> = ({
         <BeribadahForm 
           register={register} 
           errors={errors} 
-          religion={religion} 
           setValue={setValue} 
-          defaultPrayerType={defaultEntry?.prayerType}
+          defaultWorshipType={defaultEntry?.worshipType}
         />
       );
       

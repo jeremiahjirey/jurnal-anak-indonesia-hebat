@@ -13,14 +13,14 @@ interface MakanSehatFormProps {
 const MakanSehatForm: React.FC<MakanSehatFormProps> = ({ register, errors }) => {
   return (
     <div>
-      <Label htmlFor="menuMakanan">Menu Makanan</Label>
+      <Label htmlFor="activityDetail">Menu Makanan</Label>
       <Textarea
-        id="menuMakanan"
+        id="activityDetail"
         placeholder="Deskripsi menu makanan sehat yang dimakan"
         className="min-h-[100px]"
-        {...register("menuMakanan", { required: "Menu makanan harus diisi" })}
+        {...register("activityDetail", { required: "Menu makanan harus diisi" })}
       />
-      {errors.menuMakanan && <p className="text-sm text-red-500">{errors.menuMakanan.message}</p>}
+      {errors.activityDetail && <p className="text-sm text-red-500">{errors.activityDetail.message}</p>}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 // API utilities for interacting with Express backend that connects to Google Sheets
 
 import { toast } from "@/components/ui/use-toast";
@@ -16,34 +15,16 @@ export type HabitType =
   | "bermasyarakat" 
   | "tidur_cepat";
 
-export type ReligionType = 
-  | "Islam" 
-  | "Kristen" 
-  | "Katolik" 
-  | "Hindu" 
-  | "Buddha" 
-  | "Konghucu" 
-  | "lain-lain";
-
-export type PrayerType = "subuh" | "dzuhur" | "ashar" | "magrib" | "isya";
-
+// Simplified JournalEntry structure
 export interface JournalEntry {
   id?: string;
   studentId: string;
   date: string;
   habit: HabitType;
-  religion?: ReligionType;
-  // Fields specific to habit types
-  time?: string; // For bangun_pagi, tidur_cepat
-  startTime?: string; // For berolahraga
-  endTime?: string; // For berolahraga
-  prayerType?: PrayerType; // For beribadah (Islam)
-  worshipActivity?: string; // For beribadah (non-Islam)
-  menuMakanan?: string; // For makan_sehat
-  bukuDipelajari?: string; // For gemar_belajar
-  informasiDidapat?: string; // For gemar_belajar
-  kegiatan?: string; // For bermasyarakat
-  perasaanku?: string; // For bermasyarakat
+  time?: string;
+  activityDetail?: string;
+  religion?: string;
+  worshipType?: string;
   notes?: string;
   validatedByTeacher: boolean;
   validatedByParent: boolean;
@@ -161,7 +142,7 @@ export const mockApi = {
       date: "2025-05-19", 
       habit: "bangun_pagi" as HabitType, 
       time: "05:30", 
-      religion: "Islam" as ReligionType,
+      religion: "Islam",
       notes: "Bangun tepat waktu",
       validatedByTeacher: false,
       validatedByParent: true
@@ -171,8 +152,8 @@ export const mockApi = {
       studentId: "S12345", 
       date: "2025-05-19", 
       habit: "beribadah" as HabitType, 
-      religion: "Islam" as ReligionType,
-      prayerType: "subuh" as PrayerType,
+      religion: "Islam",
+      worshipType: "subuh",
       time: "05:45", 
       notes: "Sholat subuh",
       validatedByTeacher: false,
@@ -183,10 +164,10 @@ export const mockApi = {
       studentId: "S12345", 
       date: "2025-05-19", 
       habit: "berolahraga" as HabitType, 
-      startTime: "07:00",
-      endTime: "07:30",
+      time: "07:00",
+      activityDetail: "Jogging selama 30 menit",
       notes: "Jogging pagi",
-      religion: "Islam" as ReligionType,
+      religion: "Islam",
       validatedByTeacher: false,
       validatedByParent: false
     },
@@ -195,8 +176,8 @@ export const mockApi = {
       studentId: "S12345", 
       date: "2025-05-18", 
       habit: "makan_sehat" as HabitType, 
-      menuMakanan: "Sayur bayam, telur, dan nasi merah",
-      religion: "Islam" as ReligionType,
+      activityDetail: "Sayur bayam, telur, dan nasi merah",
+      religion: "Islam",
       validatedByTeacher: true,
       validatedByParent: true
     },

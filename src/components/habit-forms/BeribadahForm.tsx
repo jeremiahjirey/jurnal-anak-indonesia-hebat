@@ -4,68 +4,35 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import TimeIcon from "@/components/TimeIcon";
 import { UseFormRegister, FieldErrors, UseFormSetValue } from "react-hook-form";
-import { JournalEntry, PrayerType, ReligionType } from "@/lib/api";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { JournalEntry } from "@/lib/api";
 
 interface BeribadahFormProps {
   register: UseFormRegister<JournalEntry>;
   errors: FieldErrors<JournalEntry>;
-  religion: ReligionType | "";
   setValue: UseFormSetValue<JournalEntry>;
-  defaultPrayerType?: PrayerType;
+  defaultWorshipType?: string;
 }
 
 const BeribadahForm: React.FC<BeribadahFormProps> = ({ 
   register, 
-  errors, 
-  religion, 
+  errors,
   setValue,
-  defaultPrayerType 
+  defaultWorshipType 
 }) => {
   return (
     <div className="space-y-4">
-      {religion === "Islam" ? (
-        <>
-          <div>
-            <Label htmlFor="prayerType">Jenis Sholat</Label>
-            <Select 
-              onValueChange={(value) => setValue("prayerType", value as PrayerType)} 
-              defaultValue={defaultPrayerType}
-            >
-              <SelectTrigger id="prayerType">
-                <SelectValue placeholder="Pilih jenis sholat" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="subuh">Subuh</SelectItem>
-                <SelectItem value="dzuhur">Dzuhur</SelectItem>
-                <SelectItem value="ashar">Ashar</SelectItem>
-                <SelectItem value="magrib">Maghrib</SelectItem>
-                <SelectItem value="isya">Isya</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </>
-      ) : (
-        <>
-          <div>
-            <Label htmlFor="worshipActivity">Kegiatan Ibadah</Label>
-            <Input
-              id="worshipActivity"
-              placeholder="Contoh: Misa, Puasa, Dharma"
-              {...register("worshipActivity", { 
-                required: religion !== "" && religion !== "Islam" ? "Kegiatan ibadah harus diisi" : false 
-              })}
-            />
-            {errors.worshipActivity && <p className="text-sm text-red-500">{errors.worshipActivity.message}</p>}
-          </div>
-        </>
-      )}
+      <div>
+        <Label htmlFor="worshipType">Jenis Ibadah</Label>
+        <Input
+          id="worshipType"
+          placeholder="Contoh: Subuh, Misa, Puja, dsb."
+          defaultValue={defaultWorshipType}
+          {...register("worshipType", { 
+            required: "Jenis ibadah harus diisi" 
+          })}
+        />
+        {errors.worshipType && <p className="text-sm text-red-500">{errors.worshipType.message}</p>}
+      </div>
       
       <div>
         <Label htmlFor="time">Waktu Ibadah</Label>

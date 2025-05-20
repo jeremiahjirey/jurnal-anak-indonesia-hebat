@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { JournalEntry } from "@/lib/api";
@@ -15,24 +14,14 @@ const GemarBelajarForm: React.FC<GemarBelajarFormProps> = ({ register, errors })
   return (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="bukuDipelajari">Buku/Materi yang Dipelajari</Label>
-        <Input
-          id="bukuDipelajari"
-          placeholder="Judul buku atau materi yang dipelajari"
-          {...register("bukuDipelajari", { required: "Buku/materi harus diisi" })}
-        />
-        {errors.bukuDipelajari && <p className="text-sm text-red-500">{errors.bukuDipelajari.message}</p>}
-      </div>
-      
-      <div>
-        <Label htmlFor="informasiDidapat">Informasi yang Didapat</Label>
+        <Label htmlFor="activityDetail">Materi yang Dipelajari</Label>
         <Textarea
-          id="informasiDidapat"
-          placeholder="Informasi atau pengetahuan yang didapat"
+          id="activityDetail"
+          placeholder="Jelaskan materi atau buku yang dipelajari dan informasi yang didapat"
           className="min-h-[100px]"
-          {...register("informasiDidapat", { required: "Informasi harus diisi" })}
+          {...register("activityDetail", { required: "Materi belajar harus diisi" })}
         />
-        {errors.informasiDidapat && <p className="text-sm text-red-500">{errors.informasiDidapat.message}</p>}
+        {errors.activityDetail && <p className="text-sm text-red-500">{errors.activityDetail.message}</p>}
       </div>
     </div>
   );
