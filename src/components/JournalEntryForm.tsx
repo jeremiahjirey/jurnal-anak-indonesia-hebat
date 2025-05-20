@@ -6,8 +6,7 @@ import {
   JournalEntry, 
   mockApi as api, 
   HabitType, 
-  ReligionType, 
-  PrayerType 
+  ReligionType
 } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import TimeIcon from "@/components/TimeIcon";
+import HabitFormSelector from "./habit-forms/HabitFormSelector";
 
 interface JournalEntryFormProps {
   onSuccess: () => void;
@@ -41,7 +40,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   const [habit, setHabit] = useState<HabitType | "">((defaultEntry?.habit as HabitType) || "");
   const [religion, setReligion] = useState<ReligionType | "">((defaultEntry?.religion as ReligionType) || "");
   
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<JournalEntry>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<JournalEntry>({
     defaultValues: defaultEntry || {
       studentId: studentId || "",
       date: defaultDate ? new Date(defaultDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
@@ -104,204 +103,6 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // Dynamic form fields based on habit type
-  const renderHabitFields = () => {
-    switch (habit) {
-      case "bangun_pagi":
-        return (
-          <div className="space-y-2">
-            <Label htmlFor="time">Jam Bangun</Label>
-            <div className="relative">
-              <TimeIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="time"
-                type="time"
-                placeholder="06:00"
-                className="pl-10"
-                {...register("time", { required: "Jam bangun harus diisi" })}
-              />
-            </div>
-            {errors.time && <p className="text-sm text-red-500">{errors.time.message}</p>}
-          </div>
-        );
-        
-      case "beribadah":
-        return (
-          <div className="space-y-4">
-            {religion === "Islam" ? (
-              <>
-                <div>
-                  <Label htmlFor="prayerType">Jenis Sholat</Label>
-                  <Select 
-                    onValueChange={(value) => setValue("prayerType", value as PrayerType)} 
-                    defaultValue={defaultEntry?.prayerType}
-                  >
-                    <SelectTrigger id="prayerType">
-                      <SelectValue placeholder="Pilih jenis sholat" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="subuh">Subuh</SelectItem>
-                      <SelectItem value="dzuhur">Dzuhur</SelectItem>
-                      <SelectItem value="ashar">Ashar</SelectItem>
-                      <SelectItem value="magrib">Maghrib</SelectItem>
-                      <SelectItem value="isya">Isya</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <Label htmlFor="worshipActivity">Kegiatan Ibadah</Label>
-                  <Input
-                    id="worshipActivity"
-                    placeholder="Contoh: Misa, Puasa, Dharma"
-                    {...register("worshipActivity", { 
-                      required: religion !== "" && religion !== "Islam" ? "Kegiatan ibadah harus diisi" : false 
-                    })}
-                  />
-                  {errors.worshipActivity && <p className="text-sm text-red-500">{errors.worshipActivity.message}</p>}
-                </div>
-              </>
-            )}
-            
-            <div>
-              <Label htmlFor="time">Waktu Ibadah</Label>
-              <div className="relative">
-                <TimeIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="time"
-                  type="time"
-                  className="pl-10"
-                  {...register("time", { required: "Waktu ibadah harus diisi" })}
-                />
-              </div>
-              {errors.time && <p className="text-sm text-red-500">{errors.time.message}</p>}
-            </div>
-          </div>
-        );
-        
-      case "berolahraga":
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="startTime">Waktu Mulai</Label>
-              <div className="relative">
-                <TimeIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="startTime"
-                  type="time"
-                  className="pl-10"
-                  {...register("startTime", { required: "Waktu mulai harus diisi" })}
-                />
-              </div>
-              {errors.startTime && <p className="text-sm text-red-500">{errors.startTime.message}</p>}
-            </div>
-            
-            <div>
-              <Label htmlFor="endTime">Waktu Selesai</Label>
-              <div className="relative">
-                <TimeIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="endTime"
-                  type="time"
-                  className="pl-10"
-                  {...register("endTime", { required: "Waktu selesai harus diisi" })}
-                />
-              </div>
-              {errors.endTime && <p className="text-sm text-red-500">{errors.endTime.message}</p>}
-            </div>
-          </div>
-        );
-        
-      case "makan_sehat":
-        return (
-          <div>
-            <Label htmlFor="menuMakanan">Menu Makanan</Label>
-            <Textarea
-              id="menuMakanan"
-              placeholder="Deskripsi menu makanan sehat yang dimakan"
-              className="min-h-[100px]"
-              {...register("menuMakanan", { required: "Menu makanan harus diisi" })}
-            />
-            {errors.menuMakanan && <p className="text-sm text-red-500">{errors.menuMakanan.message}</p>}
-          </div>
-        );
-        
-      case "gemar_belajar":
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="bukuDipelajari">Buku/Materi yang Dipelajari</Label>
-              <Input
-                id="bukuDipelajari"
-                placeholder="Judul buku atau materi yang dipelajari"
-                {...register("bukuDipelajari", { required: "Buku/materi harus diisi" })}
-              />
-              {errors.bukuDipelajari && <p className="text-sm text-red-500">{errors.bukuDipelajari.message}</p>}
-            </div>
-            
-            <div>
-              <Label htmlFor="informasiDidapat">Informasi yang Didapat</Label>
-              <Textarea
-                id="informasiDidapat"
-                placeholder="Informasi atau pengetahuan yang didapat"
-                className="min-h-[100px]"
-                {...register("informasiDidapat", { required: "Informasi harus diisi" })}
-              />
-              {errors.informasiDidapat && <p className="text-sm text-red-500">{errors.informasiDidapat.message}</p>}
-            </div>
-          </div>
-        );
-        
-      case "bermasyarakat":
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="kegiatan">Kegiatan Sosial</Label>
-              <Input
-                id="kegiatan"
-                placeholder="Kegiatan bermasyarakat yang dilakukan"
-                {...register("kegiatan", { required: "Kegiatan harus diisi" })}
-              />
-              {errors.kegiatan && <p className="text-sm text-red-500">{errors.kegiatan.message}</p>}
-            </div>
-            
-            <div>
-              <Label htmlFor="perasaanku">Perasaan setelah kegiatan</Label>
-              <Textarea
-                id="perasaanku"
-                placeholder="Bagaimana perasaanmu setelah melakukan kegiatan"
-                className="min-h-[100px]"
-                {...register("perasaanku", { required: "Perasaan harus diisi" })}
-              />
-              {errors.perasaanku && <p className="text-sm text-red-500">{errors.perasaanku.message}</p>}
-            </div>
-          </div>
-        );
-        
-      case "tidur_cepat":
-        return (
-          <div>
-            <Label htmlFor="time">Jam Tidur</Label>
-            <div className="relative">
-              <TimeIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="time"
-                type="time"
-                className="pl-10"
-                {...register("time", { required: "Jam tidur harus diisi" })}
-              />
-            </div>
-            {errors.time && <p className="text-sm text-red-500">{errors.time.message}</p>}
-          </div>
-        );
-        
-      default:
-        return null;
     }
   };
 
@@ -368,7 +169,14 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
       </div>
 
       {/* Dynamic fields based on habit type */}
-      {habit && renderHabitFields()}
+      <HabitFormSelector 
+        habit={habit}
+        religion={religion}
+        register={register}
+        errors={errors}
+        setValue={setValue}
+        defaultEntry={defaultEntry}
+      />
 
       <div>
         <Label htmlFor="notes">Catatan Tambahan</Label>
