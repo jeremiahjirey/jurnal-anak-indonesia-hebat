@@ -39,10 +39,15 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ entry, onUpdate }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   
-  const categoryClasses = {
-    pagi: "journal-morning",
-    siang: "journal-afternoon",
-    malam: "journal-evening",
+  // Map habit types to CSS classes for styling
+  const habitClasses = {
+    bangun_pagi: "journal-morning",
+    beribadah: "journal-afternoon",
+    berolahraga: "journal-evening",
+    makan_sehat: "journal-morning",
+    gemar_belajar: "journal-afternoon",
+    bermasyarakat: "journal-evening",
+    tidur_cepat: "journal-evening",
   };
   
   const handleDelete = async () => {
@@ -50,8 +55,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ entry, onUpdate }) => {
     
     setIsDeleting(true);
     try {
-      // Here was the issue - mockApi.deleteEntry was called with two arguments
-      // but likely only expects one (the entry ID)
       await mockApi.deleteEntry(entry.id);
       toast({
         title: "Berhasil",
@@ -70,19 +73,49 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ entry, onUpdate }) => {
     }
   };
 
-  // Format the time for display (remove seconds if present)
-  const formattedTime = entry.time.includes(':') 
-    ? entry.time.split(':').slice(0, 2).join(':')
-    : entry.time;
+  // Get display time from the appropriate field based on habit type
+  const getDisplayTime = () => {
+    if (entry.time) return entry.time;
+    if (entry.startTime) return entry.startTime;
+    return "";
+  };
+  
+  // Get display content based on habit type
+  const getDisplayContent = () => {
+    switch (entry.habit) {
+      case "bangun_pagi":
+        return `Bangun pagi pada ${entry.time}`;
+      case "beribadah":
+        return entry.religion === "Islam" 
+          ? `${entry.prayerType} pada ${entry.time}` 
+          : `${entry.worshipActivity} pada ${entry.time}`;
+      case "berolahraga":
+        return `Olahraga dari ${entry.startTime} sampai ${entry.endTime}`;
+      case "makan_sehat":
+        return entry.menuMakanan || "Makan sehat";
+      case "gemar_belajar":
+        return `Belajar: ${entry.bukuDipelajari}`;
+      case "bermasyarakat":
+        return entry.kegiatan || "Aktivitas sosial";
+      case "tidur_cepat":
+        return `Tidur pada ${entry.time}`;
+      default:
+        return entry.notes || "";
+    }
+  };
+
+  const formattedTime = getDisplayTime().includes(':') 
+    ? getDisplayTime().split(':').slice(0, 2).join(':')
+    : getDisplayTime();
 
   return (
     <>
-      <Card className={`journal-card ${categoryClasses[entry.category]} animate-fade-in`}>
+      <Card className={`journal-card ${habitClasses[entry.habit]} animate-fade-in`}>
         <CardContent className="p-4">
           <div className="flex justify-between items-start">
             <div className="font-medium">{formattedTime}</div>
           </div>
-          <p className="mt-2 whitespace-pre-wrap">{entry.activity}</p>
+          <p className="mt-2 whitespace-pre-wrap">{getDisplayContent()}</p>
         </CardContent>
         <CardFooter className="flex justify-end space-x-2 pt-0 pb-2">
           <Button 

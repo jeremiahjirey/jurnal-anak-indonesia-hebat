@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TimeIcon } from "lucide-react";
+import TimeIcon from "@/components/TimeIcon";
 
 interface JournalEntryFormProps {
   onSuccess: () => void;
@@ -159,7 +158,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
                   <Input
                     id="worshipActivity"
                     placeholder="Contoh: Misa, Puasa, Dharma"
-                    {...register("worshipActivity", { required: religion !== "Islam" ? "Kegiatan ibadah harus diisi" : false })}
+                    {...register("worshipActivity", { required: religion !== "" && religion !== "Islam" ? "Kegiatan ibadah harus diisi" : false })}
                   />
                   {errors.worshipActivity && <p className="text-sm text-red-500">{errors.worshipActivity.message}</p>}
                 </div>

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { JournalEntry, mockApi } from "@/lib/api";
+import { JournalEntry, mockApi, HabitType } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,13 +42,11 @@ const formSchema = z.object({
   time: z.string().min(1, {
     message: "Waktu harus diisi",
   }),
-  activity: z.string().min(3, {
-    message: "Aktivitas minimal 3 karakter",
-  }).max(500, {
-    message: "Aktivitas maksimal 500 karakter",
-  }),
-  category: z.enum(["pagi", "siang", "malam"], {
-    required_error: "Kategori harus dipilih",
+  notes: z.string().max(500, {
+    message: "Catatan maksimal 500 karakter",
+  }).optional(),
+  habit: z.enum(["bangun_pagi", "beribadah", "berolahraga", "makan_sehat", "gemar_belajar", "bermasyarakat", "tidur_cepat"], {
+    required_error: "Jenis kebiasaan harus dipilih",
   }),
 });
 
@@ -70,15 +68,15 @@ const EntryForm: React.FC<EntryFormProps> = ({ entry, onSuccess, onCancel }) => 
     defaultValues: entry 
       ? {
           date: new Date(entry.date),
-          time: entry.time,
-          activity: entry.activity,
-          category: entry.category,
+          time: entry.time || "",
+          notes: entry.notes || "",
+          habit: entry.habit,
         }
       : {
           date: new Date(),
           time: format(new Date(), "HH:mm"),
-          activity: "",
-          category: "pagi",
+          notes: "",
+          habit: "bangun_pagi" as HabitType,
         },
   });
 
@@ -88,12 +86,14 @@ const EntryForm: React.FC<EntryFormProps> = ({ entry, onSuccess, onCancel }) => 
     try {
       setIsSubmitting(true);
       
-      const entryData: JournalEntry = {
+      const entryData: Partial<JournalEntry> = {
         studentId,
         date: format(values.date, "yyyy-MM-dd"),
         time: values.time,
-        activity: values.activity,
-        category: values.category,
+        notes: values.notes,
+        habit: values.habit,
+        validatedByTeacher: false,
+        validatedByParent: false
       };
       
       if (isEditing && entry?.id) {
@@ -103,7 +103,7 @@ const EntryForm: React.FC<EntryFormProps> = ({ entry, onSuccess, onCancel }) => 
           description: "Aktivitas berhasil diperbarui",
         });
       } else {
-        await mockApi.createEntry(entryData);
+        await mockApi.createEntry(entryData as JournalEntry);
         toast({
           title: "Berhasil",
           description: "Aktivitas baru berhasil dicatat",
@@ -168,6 +168,34 @@ const EntryForm: React.FC<EntryFormProps> = ({ entry, onSuccess, onCancel }) => 
           )}
         />
         
+        {/* Habit Field */}
+        <FormField
+          control={form.control}
+          name="habit"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Jenis Kebiasaan</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Jenis Kebiasaan" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="bangun_pagi">Bangun Pagi</SelectItem>
+                  <SelectItem value="beribadah">Beribadah</SelectItem>
+                  <SelectItem value="berolahraga">Berolahraga</SelectItem>
+                  <SelectItem value="makan_sehat">Makan Sehat</SelectItem>
+                  <SelectItem value="gemar_belajar">Gemar Belajar</SelectItem>
+                  <SelectItem value="bermasyarakat">Bermasyarakat</SelectItem>
+                  <SelectItem value="tidur_cepat">Tidur Cepat</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
         {/* Time Field */}
         <FormField
           control={form.control}
@@ -183,40 +211,16 @@ const EntryForm: React.FC<EntryFormProps> = ({ entry, onSuccess, onCancel }) => 
           )}
         />
         
-        {/* Category Field */}
+        {/* Notes Field */}
         <FormField
           control={form.control}
-          name="category"
+          name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Kategori</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih Kategori" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="pagi" className="text-journal-morning">Pagi</SelectItem>
-                  <SelectItem value="siang" className="text-journal-afternoon">Siang</SelectItem>
-                  <SelectItem value="malam" className="text-journal-evening">Malam</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        {/* Activity Field */}
-        <FormField
-          control={form.control}
-          name="activity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Aktivitas</FormLabel>
+              <FormLabel>Catatan (Opsional)</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Ceritakan aktivitasmu..." 
+                  placeholder="Ceritakan detail kebiasaanmu..." 
                   className="resize-none h-24"
                   {...field}
                 />
