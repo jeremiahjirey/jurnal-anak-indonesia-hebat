@@ -7,13 +7,46 @@ import { toast } from "@/components/ui/use-toast";
 const API_BASE_URL = "http://localhost:3001/api";
 
 // Types for our journal entries
+export type HabitType = 
+  | "bangun_pagi"
+  | "beribadah" 
+  | "berolahraga" 
+  | "makan_sehat" 
+  | "gemar_belajar" 
+  | "bermasyarakat" 
+  | "tidur_cepat";
+
+export type ReligionType = 
+  | "Islam" 
+  | "Kristen" 
+  | "Katolik" 
+  | "Hindu" 
+  | "Buddha" 
+  | "Konghucu" 
+  | "lain-lain";
+
+export type PrayerType = "subuh" | "dzuhur" | "ashar" | "magrib" | "isya";
+
 export interface JournalEntry {
   id?: string;
   studentId: string;
   date: string;
-  time: string;
-  activity: string;
-  category: "pagi" | "siang" | "malam";
+  habit: HabitType;
+  religion?: ReligionType;
+  // Fields specific to habit types
+  time?: string; // For bangun_pagi, tidur_cepat
+  startTime?: string; // For berolahraga
+  endTime?: string; // For berolahraga
+  prayerType?: PrayerType; // For beribadah (Islam)
+  worshipActivity?: string; // For beribadah (non-Islam)
+  menuMakanan?: string; // For makan_sehat
+  bukuDipelajari?: string; // For gemar_belajar
+  informasiDidapat?: string; // For gemar_belajar
+  kegiatan?: string; // For bermasyarakat
+  perasaanku?: string; // For bermasyarakat
+  notes?: string;
+  validatedByTeacher: boolean;
+  validatedByParent: boolean;
 }
 
 // Error handler
@@ -29,11 +62,12 @@ const handleError = (error: any) => {
 
 // API methods
 export const api = {
-  // Get entries for a student, optionally filtered by date
-  async getEntries(studentId: string, date?: string): Promise<JournalEntry[]> {
+  // Get entries for a student, optionally filtered by date and habit
+  async getEntries(studentId: string, date?: string, habit?: HabitType): Promise<JournalEntry[]> {
     try {
       let url = `${API_BASE_URL}/jurnal?studentId=${studentId}`;
       if (date) url += `&date=${date}`;
+      if (habit) url += `&habit=${habit}`;
       
       const response = await fetch(url, {
         headers: { 
@@ -121,13 +155,54 @@ export const api = {
 export const mockApi = {
   // Mock entries for testing
   _entries: [
-    { id: "1", studentId: "S12345", date: "2025-05-19", time: "08:00", activity: "Belajar Matematika", category: "pagi" as const },
-    { id: "2", studentId: "S12345", date: "2025-05-19", time: "13:00", activity: "Membaca Buku", category: "siang" as const },
-    { id: "3", studentId: "S12345", date: "2025-05-19", time: "19:30", activity: "Mengerjakan PR", category: "malam" as const },
-    { id: "4", studentId: "S12345", date: "2025-05-18", time: "07:30", activity: "Olahraga Pagi", category: "pagi" as const },
+    { 
+      id: "1", 
+      studentId: "S12345", 
+      date: "2025-05-19", 
+      habit: "bangun_pagi" as HabitType, 
+      time: "05:30", 
+      religion: "Islam" as ReligionType,
+      notes: "Bangun tepat waktu",
+      validatedByTeacher: false,
+      validatedByParent: true
+    },
+    { 
+      id: "2", 
+      studentId: "S12345", 
+      date: "2025-05-19", 
+      habit: "beribadah" as HabitType, 
+      religion: "Islam" as ReligionType,
+      prayerType: "subuh" as PrayerType,
+      time: "05:45", 
+      notes: "Sholat subuh",
+      validatedByTeacher: false,
+      validatedByParent: false
+    },
+    { 
+      id: "3", 
+      studentId: "S12345", 
+      date: "2025-05-19", 
+      habit: "berolahraga" as HabitType, 
+      startTime: "07:00",
+      endTime: "07:30",
+      notes: "Jogging pagi",
+      religion: "Islam" as ReligionType,
+      validatedByTeacher: false,
+      validatedByParent: false
+    },
+    { 
+      id: "4", 
+      studentId: "S12345", 
+      date: "2025-05-18", 
+      habit: "makan_sehat" as HabitType, 
+      menuMakanan: "Sayur bayam, telur, dan nasi merah",
+      religion: "Islam" as ReligionType,
+      validatedByTeacher: true,
+      validatedByParent: true
+    },
   ],
   
-  async getEntries(studentId: string, date?: string): Promise<JournalEntry[]> {
+  async getEntries(studentId: string, date?: string, habit?: HabitType): Promise<JournalEntry[]> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -135,6 +210,10 @@ export const mockApi = {
     
     if (date) {
       filteredEntries = filteredEntries.filter(entry => entry.date === date);
+    }
+    
+    if (habit) {
+      filteredEntries = filteredEntries.filter(entry => entry.habit === habit);
     }
     
     return filteredEntries;

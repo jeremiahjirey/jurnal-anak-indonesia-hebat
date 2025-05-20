@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, LogOut, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { mockApi, JournalEntry } from "@/lib/api";
+import { mockApi as api, JournalEntry, HabitType } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -18,8 +18,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import EntryForm from "@/components/EntryForm";
-import CategorySection from "@/components/CategorySection";
+import JournalEntryForm from "@/components/JournalEntryForm";
+import HabitSection from "@/components/HabitSection";
 
 const Dashboard: React.FC = () => {
   const { studentId, logout } = useAuth();
@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
     
     setIsLoading(true);
     try {
-      const data = await mockApi.getEntries(studentId, formattedDate);
+      const data = await api.getEntries(studentId, formattedDate);
       setEntries(data);
     } catch (error) {
       console.error("Error fetching entries:", error);
@@ -47,13 +47,17 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchEntries();
   }, [studentId, formattedDate]);
-  
-  // Group entries by category
-  const entriesByCategory = {
-    pagi: entries.filter(entry => entry.category === "pagi"),
-    siang: entries.filter(entry => entry.category === "siang"),
-    malam: entries.filter(entry => entry.category === "malam"),
-  };
+
+  // List of all habit types to display
+  const habitTypes: { type: HabitType; title: string }[] = [
+    { type: "bangun_pagi", title: "Bangun Pagi" },
+    { type: "beribadah", title: "Beribadah" },
+    { type: "berolahraga", title: "Berolahraga" },
+    { type: "makan_sehat", title: "Makan Sehat" },
+    { type: "gemar_belajar", title: "Gemar Belajar" },
+    { type: "bermasyarakat", title: "Bermasyarakat" },
+    { type: "tidur_cepat", title: "Tidur Cepat" }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -80,7 +84,7 @@ const Dashboard: React.FC = () => {
               Halo, <span className="font-medium">{studentId}</span>
             </p>
             <h2 className="text-2xl font-bold">
-              Aktivitasmu pada {format(date, "dd MMMM yyyy")}
+              Jurnal 7 Kebiasaan pada {format(date, "dd MMMM yyyy")}
             </h2>
           </div>
           
@@ -105,7 +109,7 @@ const Dashboard: React.FC = () => {
             
             <Button onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Tambah
+              Tambah Kebiasaan
             </Button>
           </div>
         </div>
@@ -114,28 +118,28 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-center py-12">
             <p>Memuat aktivitas...</p>
           </div>
+        ) : entries.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-8 text-center">
+            <h3 className="text-lg font-semibold mb-2">Belum ada aktivitas</h3>
+            <p className="text-muted-foreground mb-4">
+              Anda belum mencatat kebiasaan apapun pada tanggal ini
+            </p>
+            <Button onClick={() => setIsAddDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Kebiasaan Sekarang
+            </Button>
+          </div>
         ) : (
           <div className="space-y-8">
-            <CategorySection
-              title="Aktivitas Pagi"
-              category="pagi"
-              entries={entriesByCategory.pagi}
-              onUpdate={fetchEntries}
-            />
-            
-            <CategorySection
-              title="Aktivitas Siang"
-              category="siang"
-              entries={entriesByCategory.siang}
-              onUpdate={fetchEntries}
-            />
-            
-            <CategorySection
-              title="Aktivitas Malam"
-              category="malam"
-              entries={entriesByCategory.malam}
-              onUpdate={fetchEntries}
-            />
+            {habitTypes.map((habit) => (
+              <HabitSection
+                key={habit.type}
+                title={habit.title}
+                habitType={habit.type}
+                entries={entries}
+                onUpdate={fetchEntries}
+              />
+            ))}
           </div>
         )}
       </main>
@@ -144,9 +148,10 @@ const Dashboard: React.FC = () => {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Aktivitas Baru</DialogTitle>
+            <DialogTitle>Tambah Kebiasaan Baru</DialogTitle>
           </DialogHeader>
-          <EntryForm 
+          <JournalEntryForm 
+            defaultDate={date}
             onSuccess={() => {
               setIsAddDialogOpen(false);
               fetchEntries();
